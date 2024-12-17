@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class playerScript : MonoBehaviour
 {
@@ -23,5 +24,11 @@ public class playerScript : MonoBehaviour
             rb.AddForce(new Vector3(sideForce, 0, 0) * Time.deltaTime);
         }
 
+    }
+
+    private void OnCollisionEnter(Collision collision){
+        if (collision.gameObject.CompareTag("obstacle")){
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
     }
 }
