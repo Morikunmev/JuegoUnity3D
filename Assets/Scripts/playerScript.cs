@@ -22,7 +22,7 @@ public class playerScript : MonoBehaviour
         if (currentLevel == 1) jumpsRemaining = 1;
         else if (currentLevel == 2) jumpsRemaining = 2;
         else if (currentLevel == 3) jumpsRemaining = 3;
-        
+
         halfScreen = Screen.width / 2;
     }
 
@@ -42,6 +42,17 @@ public class playerScript : MonoBehaviour
         {
             Touch touch = Input.GetTouch(0);
 
+            // Para movimiento lateral - toque simple
+            if (touch.position.x <= halfScreen)
+            {
+                rb.AddForce(new Vector3(-sideForce, 0, 0) * Time.deltaTime);
+            }
+            else
+            {
+                rb.AddForce(new Vector3(sideForce, 0, 0) * Time.deltaTime);
+            }
+
+            // Para el salto - detectar swipe hacia arriba
             switch (touch.phase)
             {
                 case TouchPhase.Began:
@@ -50,26 +61,11 @@ public class playerScript : MonoBehaviour
 
                 case TouchPhase.Ended:
                     Vector2 swipeDelta = touch.position - touchStart;
-
-                    // Detectar swipe vertical
                     if (swipeDelta.y > minimumSwipeDistance && jumpsRemaining > 0)
                     {
-                        // Swipe hacia arriba - Saltar
                         rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
                         jumpsRemaining--;
                         Debug.Log($"Salto por swipe. Saltos restantes: {jumpsRemaining}");
-                    }
-                    else if (Mathf.Abs(swipeDelta.y) < minimumSwipeDistance)
-                    {
-                        // Movimiento lateral si no es un swipe vertical
-                        if (touch.position.x <= halfScreen)
-                        {
-                            rb.AddForce(new Vector3(-sideForce, 0, 0) * Time.deltaTime);
-                        }
-                        else
-                        {
-                            rb.AddForce(new Vector3(sideForce, 0, 0) * Time.deltaTime);
-                        }
                     }
                     break;
             }
@@ -89,7 +85,7 @@ public class playerScript : MonoBehaviour
             if (currentLevel == 1) jumpsRemaining = 1;
             else if (currentLevel == 2) jumpsRemaining = 2;
             else if (currentLevel == 3) jumpsRemaining = 3;
-            
+
             SceneManager.LoadScene(currentLevel);
         }
     }
@@ -102,7 +98,7 @@ public class playerScript : MonoBehaviour
             if (currentLevel == 1) jumpsRemaining = 1;
             else if (currentLevel == 2) jumpsRemaining = 2;
             else if (currentLevel == 3) jumpsRemaining = 3;
-            
+
             SceneManager.LoadScene(currentLevel);
         }
     }
