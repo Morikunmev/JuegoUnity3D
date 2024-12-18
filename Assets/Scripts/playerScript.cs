@@ -9,11 +9,13 @@ public class playerScript : MonoBehaviour
     public float forwardSpeed;
     public float sideForce;
     public float jumpForce = 5f;
-    private bool hasJumped = false;
+    private int jumpsRemaining;  // Contador de saltos
 
     void Start()
     {
-        hasJumped = false;
+        // Establece los saltos según el nivel
+        int currentLevel = SceneManager.GetActiveScene().buildIndex;
+        jumpsRemaining = currentLevel == 0 ? 1 : currentLevel + 1;  // Nivel 1: 1 salto, Nivel 2: 2 saltos, Nivel 3: 3 saltos
     }
 
     void Update()
@@ -26,20 +28,18 @@ public class playerScript : MonoBehaviour
         if (Input.GetKey(KeyCode.D))
             rb.AddForce(new Vector3(sideForce, 0, 0) * Time.deltaTime);
 
-        // Solo para nivel 0 (primer nivel)
-        if (SceneManager.GetActiveScene().buildIndex == 0)
+        // Sistema de saltos para todos los niveles
+        if (Input.GetKeyDown(KeyCode.Space) && jumpsRemaining > 0)
         {
-            if (Input.GetKeyDown(KeyCode.Space) && !hasJumped)
-            {
-                rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-                hasJumped = true;
-                Debug.Log("Salto realizado - No más saltos disponibles hasta reiniciar nivel");
-            }
+            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            jumpsRemaining--;
+            Debug.Log($"Salto realizado. Saltos restantes: {jumpsRemaining}");
         }
 
         if (transform.position.y < -5)
         {
-            hasJumped = false;  // Reset solo cuando cae
+            int currentLevel = SceneManager.GetActiveScene().buildIndex;
+            jumpsRemaining = currentLevel == 0 ? 1 : currentLevel + 1;
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
     }
@@ -48,15 +48,14 @@ public class playerScript : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("obstacle"))
         {
-            hasJumped = false;  // Reset cuando choca con obstáculo
+            int currentLevel = SceneManager.GetActiveScene().buildIndex;
+            jumpsRemaining = currentLevel == 0 ? 1 : currentLevel + 1;
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
     }
 
     public int GetJumpsRemaining()
     {
-        if (SceneManager.GetActiveScene().buildIndex == 0)
-            return hasJumped ? 0 : 1;
-        return 0;
+        return jumpsRemaining;
     }
 }
