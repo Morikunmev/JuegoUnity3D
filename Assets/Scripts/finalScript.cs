@@ -11,9 +11,9 @@ public class finalScript : MonoBehaviour
         {
             int buildIndex = SceneManager.GetActiveScene().buildIndex;
             
-            if (buildIndex == 3)  // Si estamos en el último nivel
+            if (buildIndex >= 3)
             {
-                SceneManager.LoadScene(0);  // Volver al menú
+                SceneManager.LoadScene(0);
             }
             else
             {

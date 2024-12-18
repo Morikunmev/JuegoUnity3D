@@ -24,7 +24,6 @@ public class UIManager : MonoBehaviour
     {
         if (player != null && final != null && playerScriptComponent != null)
         {
-            // Restamos 1 para compensar el menú
             int currentLevel = SceneManager.GetActiveScene().buildIndex;
             float distanceToFinish = Vector3.Distance(player.transform.position, final.transform.position);
             int jumpsLeft = playerScriptComponent.GetJumpsRemaining();

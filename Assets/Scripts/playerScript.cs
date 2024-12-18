@@ -12,11 +12,16 @@ public class playerScript : MonoBehaviour
     private int jumpsRemaining;
     private int halfScreen;
 
+    // Variables para detectar el swipe
+    private Vector2 touchStart;
+    private float minimumSwipeDistance = 50f; // Ajusta esta distancia según necesites
+
     void Start()
     {
-        // Ajustamos el cálculo de saltos considerando que el índice 0 es el menú
-        int currentLevel = SceneManager.GetActiveScene().buildIndex - 1; // Restamos 1 para compensar el menú
-        jumpsRemaining = currentLevel == 0 ? 1 : currentLevel;  // Nivel 1: 1 salto, Nivel 2: 2 saltos, Nivel 3: 3 saltos
+        int currentLevel = SceneManager.GetActiveScene().buildIndex;
+        if (currentLevel == 1) jumpsRemaining = 1;
+        else if (currentLevel == 2) jumpsRemaining = 2;
+        else if (currentLevel == 3) jumpsRemaining = 3;
         
         halfScreen = Screen.width / 2;
     }
@@ -25,24 +30,52 @@ public class playerScript : MonoBehaviour
     {
         rb.AddForce(new Vector3(0, 0, forwardSpeed) * Time.deltaTime);
 
+        // Controles de teclado
         if (Input.GetKey(KeyCode.A))
             rb.AddForce(new Vector3(-sideForce, 0, 0) * Time.deltaTime);
 
         if (Input.GetKey(KeyCode.D))
             rb.AddForce(new Vector3(sideForce, 0, 0) * Time.deltaTime);
 
+        // Controles táctiles
         if (Input.touchCount > 0)
         {
-            if (Input.GetTouch(0).position.x <= halfScreen)
+            Touch touch = Input.GetTouch(0);
+
+            switch (touch.phase)
             {
-                rb.AddForce(new Vector3(-sideForce, 0, 0) * Time.deltaTime);
-            }
-            if (Input.GetTouch(0).position.x > halfScreen)
-            {
-                rb.AddForce(new Vector3(sideForce, 0, 0) * Time.deltaTime);
+                case TouchPhase.Began:
+                    touchStart = touch.position;
+                    break;
+
+                case TouchPhase.Ended:
+                    Vector2 swipeDelta = touch.position - touchStart;
+
+                    // Detectar swipe vertical
+                    if (swipeDelta.y > minimumSwipeDistance && jumpsRemaining > 0)
+                    {
+                        // Swipe hacia arriba - Saltar
+                        rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+                        jumpsRemaining--;
+                        Debug.Log($"Salto por swipe. Saltos restantes: {jumpsRemaining}");
+                    }
+                    else if (Mathf.Abs(swipeDelta.y) < minimumSwipeDistance)
+                    {
+                        // Movimiento lateral si no es un swipe vertical
+                        if (touch.position.x <= halfScreen)
+                        {
+                            rb.AddForce(new Vector3(-sideForce, 0, 0) * Time.deltaTime);
+                        }
+                        else
+                        {
+                            rb.AddForce(new Vector3(sideForce, 0, 0) * Time.deltaTime);
+                        }
+                    }
+                    break;
             }
         }
 
+        // Salto con espacio (mantenemos para pruebas en PC)
         if (Input.GetKeyDown(KeyCode.Space) && jumpsRemaining > 0)
         {
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
@@ -52,10 +85,12 @@ public class playerScript : MonoBehaviour
 
         if (transform.position.y < -5)
         {
-            // Ajustamos el cálculo al reiniciar
-            int currentLevel = SceneManager.GetActiveScene().buildIndex - 1;
-            jumpsRemaining = currentLevel == 0 ? 1 : currentLevel;
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            int currentLevel = SceneManager.GetActiveScene().buildIndex;
+            if (currentLevel == 1) jumpsRemaining = 1;
+            else if (currentLevel == 2) jumpsRemaining = 2;
+            else if (currentLevel == 3) jumpsRemaining = 3;
+            
+            SceneManager.LoadScene(currentLevel);
         }
     }
 
@@ -63,10 +98,12 @@ public class playerScript : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("obstacle"))
         {
-            // Ajustamos el cálculo al chocar
-            int currentLevel = SceneManager.GetActiveScene().buildIndex - 1;
-            jumpsRemaining = currentLevel == 0 ? 1 : currentLevel;
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            int currentLevel = SceneManager.GetActiveScene().buildIndex;
+            if (currentLevel == 1) jumpsRemaining = 1;
+            else if (currentLevel == 2) jumpsRemaining = 2;
+            else if (currentLevel == 3) jumpsRemaining = 3;
+            
+            SceneManager.LoadScene(currentLevel);
         }
     }
 
