@@ -9,35 +9,54 @@ public class playerScript : MonoBehaviour
     public float forwardSpeed;
     public float sideForce;
     public float jumpForce = 5f;
-    private bool hasJumped = false; // Cambiamos a hasJumped para rastrear si ya saltó
+    private bool hasJumped = false;
 
     void Start()
     {
-        hasJumped = false; // Aseguramos que empiece sin haber saltado
+        hasJumped = false;
     }
 
     void Update()
     {
         rb.AddForce(new Vector3(0, 0, forwardSpeed) * Time.deltaTime);
-        if (Input.GetKey(KeyCode.A)){
+        
+        if (Input.GetKey(KeyCode.A))
             rb.AddForce(new Vector3(-sideForce, 0, 0) * Time.deltaTime);
-        }
-        if (Input.GetKey(KeyCode.D)){
+        
+        if (Input.GetKey(KeyCode.D))
             rb.AddForce(new Vector3(sideForce, 0, 0) * Time.deltaTime);
+
+        // Solo para nivel 0 (primer nivel)
+        if (SceneManager.GetActiveScene().buildIndex == 0)
+        {
+            if (Input.GetKeyDown(KeyCode.Space) && !hasJumped)
+            {
+                rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+                hasJumped = true;
+                Debug.Log("Salto realizado - No más saltos disponibles hasta reiniciar nivel");
+            }
         }
-        // Solo salta si no ha saltado antes
-        if (Input.GetKeyDown(KeyCode.Space) && !hasJumped){
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-            hasJumped = true; // Marca que ya usó su único salto
-        }
-        if (transform.position.y<-5){
+
+        if (transform.position.y < -5)
+        {
+            hasJumped = false;  // Reset solo cuando cae
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
     }
 
-    private void OnCollisionEnter(Collision collision){
-        if (collision.gameObject.CompareTag("obstacle")){
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("obstacle"))
+        {
+            hasJumped = false;  // Reset cuando choca con obstáculo
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
+    }
+
+    public int GetJumpsRemaining()
+    {
+        if (SceneManager.GetActiveScene().buildIndex == 0)
+            return hasJumped ? 0 : 1;
+        return 0;
     }
 }

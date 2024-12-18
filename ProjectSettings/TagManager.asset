@@ -6,6 +6,7 @@ TagManager:
   tags:
   - obstacle
   - ground
+  - Final
   layers:
   - Default
   - TransparentFX
