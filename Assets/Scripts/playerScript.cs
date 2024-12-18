@@ -9,26 +9,40 @@ public class playerScript : MonoBehaviour
     public float forwardSpeed;
     public float sideForce;
     public float jumpForce = 5f;
-    private int jumpsRemaining;  // Contador de saltos
+    private int jumpsRemaining;
+    private int halfScreen;
 
     void Start()
     {
-        // Establece los saltos según el nivel
-        int currentLevel = SceneManager.GetActiveScene().buildIndex;
-        jumpsRemaining = currentLevel == 0 ? 1 : currentLevel + 1;  // Nivel 1: 1 salto, Nivel 2: 2 saltos, Nivel 3: 3 saltos
+        // Ajustamos el cálculo de saltos considerando que el índice 0 es el menú
+        int currentLevel = SceneManager.GetActiveScene().buildIndex - 1; // Restamos 1 para compensar el menú
+        jumpsRemaining = currentLevel == 0 ? 1 : currentLevel;  // Nivel 1: 1 salto, Nivel 2: 2 saltos, Nivel 3: 3 saltos
+        
+        halfScreen = Screen.width / 2;
     }
 
     void Update()
     {
         rb.AddForce(new Vector3(0, 0, forwardSpeed) * Time.deltaTime);
-        
+
         if (Input.GetKey(KeyCode.A))
             rb.AddForce(new Vector3(-sideForce, 0, 0) * Time.deltaTime);
-        
+
         if (Input.GetKey(KeyCode.D))
             rb.AddForce(new Vector3(sideForce, 0, 0) * Time.deltaTime);
 
-        // Sistema de saltos para todos los niveles
+        if (Input.touchCount > 0)
+        {
+            if (Input.GetTouch(0).position.x <= halfScreen)
+            {
+                rb.AddForce(new Vector3(-sideForce, 0, 0) * Time.deltaTime);
+            }
+            if (Input.GetTouch(0).position.x > halfScreen)
+            {
+                rb.AddForce(new Vector3(sideForce, 0, 0) * Time.deltaTime);
+            }
+        }
+
         if (Input.GetKeyDown(KeyCode.Space) && jumpsRemaining > 0)
         {
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
@@ -38,8 +52,9 @@ public class playerScript : MonoBehaviour
 
         if (transform.position.y < -5)
         {
-            int currentLevel = SceneManager.GetActiveScene().buildIndex;
-            jumpsRemaining = currentLevel == 0 ? 1 : currentLevel + 1;
+            // Ajustamos el cálculo al reiniciar
+            int currentLevel = SceneManager.GetActiveScene().buildIndex - 1;
+            jumpsRemaining = currentLevel == 0 ? 1 : currentLevel;
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
     }
@@ -48,8 +63,9 @@ public class playerScript : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("obstacle"))
         {
-            int currentLevel = SceneManager.GetActiveScene().buildIndex;
-            jumpsRemaining = currentLevel == 0 ? 1 : currentLevel + 1;
+            // Ajustamos el cálculo al chocar
+            int currentLevel = SceneManager.GetActiveScene().buildIndex - 1;
+            jumpsRemaining = currentLevel == 0 ? 1 : currentLevel;
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
     }

@@ -3,26 +3,20 @@ using System.Collections.Generic;        // Importa colecciones genéricas
 using UnityEngine;                      // Importa la funcionalidad principal de Unity
 using UnityEngine.SceneManagement;      // Importa el manejo de escenas de Unity
 
-public class finalScript : MonoBehaviour // Define una clase que hereda de MonoBehaviour
+public class finalScript : MonoBehaviour
 {
-    // Este método se ejecuta cuando algo entra en el trigger del objeto
     private void OnTriggerEnter(Collider other)
     {
-        // Verifica si el objeto que entró tiene el tag "Player"
         if (other.gameObject.CompareTag("Player"))
         {
-            // Obtiene el índice de la escena actual
             int buildIndex = SceneManager.GetActiveScene().buildIndex;
             
-            // Si estamos en la escena 2 (índice 2)
-            if (buildIndex == 2)
+            if (buildIndex == 3)  // Si estamos en el último nivel
             {
-                // Vuelve a la primera escena (índice 0)
-                SceneManager.LoadScene(0);
+                SceneManager.LoadScene(0);  // Volver al menú
             }
             else
             {
-                // Carga la siguiente escena (índice actual + 1)
                 SceneManager.LoadScene(buildIndex + 1);
             }
         }
