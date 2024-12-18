@@ -15,7 +15,7 @@ public class finalScript : MonoBehaviour // Define una clase que hereda de MonoB
             int buildIndex = SceneManager.GetActiveScene().buildIndex;
             
             // Si estamos en la escena 2 (índice 2)
-            if (buildIndex == 1)
+            if (buildIndex == 2)
             {
                 // Vuelve a la primera escena (índice 0)
                 SceneManager.LoadScene(0);
